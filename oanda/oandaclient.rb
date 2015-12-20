@@ -14,6 +14,13 @@ class OandaClient
   def getAccount()
     res = _api_request("v1/accounts")
     p res
+    return res
+  end
+
+  def getInstruments()
+    accountId = self.getAccount()['accounts'][0]['accountId']
+    res = _api_request("v1/instruments?accountId=#{accountId}")
+    p res
   end
 
   def getCurrentRate(instrument: 'USD_JPY')
