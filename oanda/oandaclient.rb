@@ -12,7 +12,17 @@ class OandaClient
   end
 
   def getAccount()
-    res = _api_request('v1/accounts')
+    res = _api_request("v1/accounts")
+    p res
+  end
+
+  def getCurrentRate(instrument: 'USD_JPY')
+    res = _api_request("v1/prices?instruments=#{instrument}")
+    p res
+  end
+
+  def getHistoricalRate(instrument: 'USD_JPY', granularity: 'M5', count: 1)
+    res = _api_request("v1/candles?instrument=#{instrument}&granularity=#{granularity}&count=#{count}")
     p res
   end
 
