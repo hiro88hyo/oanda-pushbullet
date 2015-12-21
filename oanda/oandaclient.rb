@@ -12,30 +12,34 @@ class OandaClient
   end
 
   def getAccount()
-    res = _api_request("v1/accounts")
+    res = _api_get("v1/accounts")
     p res
     return res
   end
 
   def getInstruments()
     accountId = self.getAccount()['accounts'][0]['accountId']
-    res = _api_request("v1/instruments?accountId=#{accountId}")
-    p res
+    res = _api_get("v1/instruments?accountId=#{accountId}")
+    return res
   end
 
   def getCurrentRate(instrument: 'USD_JPY')
-    res = _api_request("v1/prices?instruments=#{instrument}")
-    p res
+    res = _api_get("v1/prices?instruments=#{instrument}")
+    return res
   end
 
   def getHistoricalRate(instrument: 'USD_JPY', granularity: 'M5', count: 1)
-    res = _api_request("v1/candles?instrument=#{instrument}&granularity=#{granularity}&count=#{count}")
-    p res
+    res = _api_get("v1/candles?instrument=#{instrument}&granularity=#{granularity}&count=#{count}")
+    return res
   end
 
-  def _api_request(command)
+  def _api_get(command)
     uri = URI.parse(@api_endpoint+command)
-    https = Net::HTTP.new(uri.host, uri.port)
+    
+    proxy_env = URI.parse(ENV["http_proxy"])
+    proxy_user, proxy_pass = proxy_env.userinfo.split(":")
+    
+    https = Net::HTTP.new(uri.host, uri.port, proxy_env.host, proxy_env.port, proxy_user, proxy_pass)
     https.use_ssl = true
     req = Net::HTTP::Get.new(uri.request_uri)
     req['Authorization'] = "Bearer #{@access_token}"
