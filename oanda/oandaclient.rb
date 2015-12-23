@@ -35,11 +35,17 @@ class OandaClient
 
   def _api_get(command)
     uri = URI.parse(@api_endpoint+command)
-    
-    proxy_env = URI.parse(ENV["http_proxy"])
-    proxy_user, proxy_pass = proxy_env.userinfo.split(":")
-    
-    https = Net::HTTP.new(uri.host, uri.port, proxy_env.host, proxy_env.port, proxy_user, proxy_pass)
+
+    if ENV["http_proxy"]
+      proxy_env = URI.parse(ENV["http_proxy"])
+      proxy_user, proxy_pass = proxy_env.userinfo.split(":")
+    end
+
+    if proxy_env
+      https = Net::HTTP.new(uri.host, uri.port, proxy_env.host, proxy_env.port, proxy_user, proxy_pass)
+    else
+      https = Net::HTTP.new(uri.host, uri.port)
+    end
     https.use_ssl = true
     req = Net::HTTP::Get.new(uri.request_uri)
     req['Authorization'] = "Bearer #{@access_token}"
